@@ -1,1 +1,2 @@
-# PracticalTest01Var04
+Harea Teodor-Adrian
+343C2
