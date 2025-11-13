@@ -1,7 +1,12 @@
 package ro.pub.cs.systems.eim.practicaltest01var04;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -29,6 +34,14 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
     TextView information_textView;
     Button display_information_button;
     private ActivityResultLauncher<Intent> activityResultLauncher;
+    private final IntentFilter intentFilter = new IntentFilter();
+    private final MessageBroadcastReceiver messageBroadcastReceiver = new MessageBroadcastReceiver();
+    private static class MessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("BC RECEIVER", Objects.requireNonNull(intent.getStringExtra("broadcast_receiver_extra")));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +68,11 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
             }
 
             information_textView.setText(information.toString());
+
+            Intent intent = new Intent(getApplicationContext(), PracticalTest01Var04Service.class);
+            intent.putExtra("name", editText1.getText().toString());
+            intent.putExtra("group", editText2.getText().toString());
+            getApplicationContext().startService(intent);
         });
 
         activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -80,7 +98,7 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
         });
 
 
-
+        intentFilter.addAction("send_message");
     }
 
     @Override
@@ -105,5 +123,31 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
         } else {
             editText2.setText("0");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(messageBroadcastReceiver, intentFilter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(messageBroadcastReceiver, intentFilter);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(messageBroadcastReceiver);
+        super.onPause();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, PracticalTest01Var04Service.class);
+        stopService(intent);
+
+        super.onDestroy();
     }
 }
