@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -45,11 +46,34 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
                 // add information from editText2
                 information.append(editText2.getText().toString());
             }
-//            information.append("Checkbox 1: ").append(checkBox1.isChecked() ? "checked" : "not checked").append("\n");
-//            information.append("Checkbox 2: ").append(checkBox2.isChecked() ? "checked" : "not checked").append("\n");
-//            information.append("EditText 1: ").append(editText1.getText().toString()).append("\n");
-//            information.append("EditText 2: ").append(editText2.getText().toString()).append("\n");
+
             information_textView.setText(information.toString());
         });
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("text1", editText1.getText().toString());
+        outState.putString("text2", editText2.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState.containsKey("text1")) {
+            editText1.setText(savedInstanceState.getString("text1"));
+        } else {
+            editText1.setText("");
+        }
+
+        if (savedInstanceState.containsKey("text2")) {
+            editText2.setText(savedInstanceState.getString("text2"));
+        } else {
+            editText2.setText("0");
+        }
     }
 }
